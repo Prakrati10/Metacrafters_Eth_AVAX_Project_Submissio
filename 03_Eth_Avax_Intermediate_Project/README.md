@@ -10,26 +10,26 @@ The myToken smart contract is a basic implementation of a token contract on the 
 
 **Contract Attributes**
 
-owner: This address variable stores the Ethereum address of the contract owner.
+**owner:** This address variable stores the Ethereum address of the contract owner.
 
-TokenName and Tokensymbol: These string variables represent the name and symbol of the token, respectively.
+**TokenName and Tokensymbol:** These string variables represent the name and symbol of the token, respectively.
 
-TokenDecimals: An unsigned integer variable specifying the number of decimal places for token balances.
+**TokenDecimals:** An unsigned integer variable specifying the number of decimal places for token balances.
 
 TokenTotalSupply: An unsigned integer variable representing the total supply of tokens. It is initially set to 0.
 
-Functions
+**Functions**
+
 **mintTokens(address to, uint256 amount)**
 This function allows the contract owner to create (mint) new tokens.
 
-Parameters:
+**Parameters:**
 
 to: The recipient's address.
 amount: The amount of tokens to mint.
 It increases the TokenTotalSupply by the specified amount and adds the minted tokens to the balance of the recipient's address.
 
-**
-transferTokens(address receiver, uint256 amount)**
+**transferTokens(address receiver, uint256 amount)**
 
 This function enables token transfers between addresses.
 
@@ -49,7 +49,7 @@ This function allows token holders to destroy (burn) their tokens.
 amount: The amount of tokens to burn.
 It checks if the sender has a balance greater than or equal to the burn amount and then reduces the TokenTotalSupply and subtracts the burned tokens from the sender's balance.
 
-approve(address spender, uint256 value)
+**approve(address spender, uint256 value)**
 This function implements an approval system for managing token allowances.
 
 Parameters:
