@@ -65,7 +65,7 @@ The myToken smart contract is a basic implementation of a token contract on the 
 
 TokenTotalSupply: An unsigned integer variable representing the total supply of tokens. It is initially set to 0.
 
-# Functions
+## Functions
 
 **mintTokens(address to, uint256 amount)**
 This function allows the contract owner to create (mint) new tokens.
