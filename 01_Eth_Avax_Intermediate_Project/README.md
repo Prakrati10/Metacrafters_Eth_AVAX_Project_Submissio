@@ -6,88 +6,47 @@ The code represents a Solidity smart contract named Exception that showcases exc
 
 This Solidity contract, named ErrorHandlingContract, serves as a simple example to demonstrate various error handling mechanisms in Solidity. It includes the usage of require, assert, and revert to handle different types of errors that can occur during smart contract execution.|
 
-**State Variables**
-```solidity
-uint256 public balance = 1000;
-address public owner;
-```
+```soldity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.18;
 
-uint256 public balance: This variable represents the balance of the contract and is initialized to 1000.
-address public owner: The owner variable stores the address of the contract creator.
+contract ExceptionHandling {
 
-**Constructor**
+    // Function that uses 'require' for input validation
+    function RequireTest(uint a, uint b) public pure {
+        require(a + b < 10, "Ensure that the combined total of the provided numbers remains below 10.");
+    }
 
-```solidity
-constructor() {
-    owner = msg.sender;
+    // Function that uses 'assert' for checking a condition
+    function AssertTest(uint c) public pure {
+        assert(c >= 5);
+    }
+
+    // Function that uses 'revert' with a custom error message
+    function RevertTest(uint d, uint e) public pure {
+        if (d + e > 10) {
+            revert("Please ensure that the sum of the entered numbers does not exceed 10.");
+        }
+    }
 }
 ```
 
-The constructor sets the owner of the contract to the address of the account that deploys the contract. This address is stored in the owner state variable.
+The contract ExceptionHandling is defined, and it contains three functions for demonstrating different error-handling mechanisms in Solidity: require, assert, and revert.
 
-**Functions**
+**RequireTest Function:**
 
-**deposit(uint256 amount)**
-```solidity
-   function deposit(uint256 amount) public {
+This function takes two unsigned integer parameters, a and b.
+It uses the require statement to validate that the sum of a and b is less than 10. If this condition is not met, the function reverts and provides the error message "Ensure that the combined total of the provided numbers remains below 10."
+The purpose of this function is to check and ensure that a condition holds true, typically used for input validation.
 
-        // Test 'Require' Function to handle error
+**AssertTest Function:**
 
-        require(amount > 0, "Amount must be greater than 0");
-        balance += amount;
-    }
-```
+This function takes an unsigned integer parameter, c.
+It uses the assert statement to check if c is greater than or equal to 5. If this condition is not met, the function reverts.
+Unlike require, assert is used for conditions that should always be true, and it ensures that a critical invariant is not violated.
 
-This function allows users to deposit a specified amount of cryptocurrency into the contract's balance.
-It utilizes the require function to ensure that the provided amount is greater than 0.
-If the requirement is met, the amount is added to the contract's balance.
+**RevertTest Function:**
 
-**withdraw(uint256 amount)**
-```solidity
-    function withdraw(uint256 amount) public {
-
-        require(msg.sender == owner, "Only the owner can withdraw");
-        require(amount > 0, "Amount must be greater than 0");
-        require(balance >= amount, "Insufficient balance");
-        balance -= amount;
-    }
-```
-This function permits the contract owner (the account that deployed the contract) to withdraw a specified amount of cryptocurrency from the contract's balance.
-It uses require statements to ensure that:
-The caller of the function is the contract owner.
-The provided amount is greater than 0.
-Sufficient balance is available in the contract to perform the withdrawal.
-If all requirements are met, the amount is subtracted from the contract's balance.
-
-**assertExample(uint256 a, uint256 b)**
-```solidity
-    function assertExample(uint256 a, uint256 b) public pure returns (uint256) {
-
-        // Test 'assert' function to handle error
-
-        assert(a <= b);
-        return a - b;
-    }
-```
-
-This function showcases the use of the assert statement.
-It checks if a is less than or equal to b.
-If the assertion fails (i.e., a is greater than b), the transaction will revert with an error message.
-
-**revertExample(uint256 a, uint256 b)**
-```solidity
-    function revertExample(uint256 a, uint256 b) public pure returns (uint256) {
-
-        if (a <= b) {
-            // Test 'revert' function to handle error
-
-            revert("a must be greater than or equal to b");
-        }
-
-        return a - b;
-    }
-```
-
-This function demonstrates the revert function.
-If a is not greater than or equal to b, it explicitly triggers a revert with the message "a must be greater than or equal to b.
-
+This function takes two unsigned integer parameters, d and e.
+It uses a conditional statement to check if the sum of d and e is greater than 10. If this condition is met, the function explicitly calls revert with the custom error message "Please ensure that the sum of the entered numbers does not exceed 10."
+revert is often used for custom error handling, allowing developers to provide descriptive error messages, and it gracefully reverts the transaction when necessary.
