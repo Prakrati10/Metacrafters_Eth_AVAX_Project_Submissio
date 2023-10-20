@@ -6,6 +6,53 @@ The Solidity smart contract, labeled under the MIT License, is a basic implement
 
 ## Code 
 
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.18;
+
+contract myToken {
+
+    address public owner;
+    string public TokenName;
+    string public TokenAbbre;
+    uint8 public TokenDecimals;
+    uint256 public TokenTotalSupply;
+
+    constructor() {
+        owner = msg.sender;
+        TokenName = "MetacraftersERC";
+        TokenAbbre = "CRED";
+        TokenDecimals = 10;
+        TokenTotalSupply = 0;
+    }
+
+    modifier Owner() {
+        require( msg.sender == owner, "Only the Admin can use creation tokens.");
+        _;
+    }
+
+    mapping(address => uint256) public balance;
+
+    function Minting(address to, uint256 amount) public Owner{
+        TokenTotalSupply += amount;
+        balance[to] += amount;
+    }
+
+    function transferTokens(address reciever, uint256 amount) public {
+        require( balance[msg.sender] >= amount, "Please choose an amount that is either equal to or less than your current balance." );
+
+        balance[msg.sender] -= amount;
+        balance[reciever] += amount;
+    }
+
+    function Burning(uint256 amount) public {
+        require( balance[msg.sender] >= amount,"Please select an amount that is equal to or less than your current balance.");
+
+        TokenTotalSupply -= amount;
+        balance[msg.sender] -= amount;
+    }
+}
+```
 The myToken smart contract is a basic implementation of a token contract on the Ethereum blockchain. It serves as a starting point for creating custom tokens and token-based applications. Let's break down its components, functions, and key concepts:
 
 **Contract Attributes**
@@ -49,16 +96,8 @@ This function allows token holders to destroy (burn) their tokens.
 amount: The amount of tokens to burn.
 It checks if the sender has a balance greater than or equal to the burn amount and then reduces the TokenTotalSupply and subtracts the burned tokens from the sender's balance.
 
-**approve(address spender, uint256 value)**
-This function implements an approval system for managing token allowances.
-
-Parameters:
-
-spender: The address allowed to spend the sender's tokens.
-value: The maximum amount of tokens the spender is allowed to spend.
-It sets the allowance for the spender, allowing them to spend tokens on behalf of the sender. An Approval event is emitted to record the approval.
-
 ## Usage
+
 This contract can serve as a foundation for building more complex token-based applications on the Ethereum network. Developers can customize it to define their token's name, symbol, supply, and functionality.
 
 Please note that this contract is provided as a basic example and may require additional features and security measures for production use.
