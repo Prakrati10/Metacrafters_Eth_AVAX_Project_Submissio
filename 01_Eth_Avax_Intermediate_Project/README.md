@@ -4,28 +4,40 @@ The code represents a Solidity smart contract named Exception that showcases exc
 
 ## Code Explanation - Error Handling Solidity Contract
 
-This Solidity contract, named ErrorHandlingContract, serves as a simple example to demonstrate various error handling mechanisms in Solidity. It includes the usage of require, assert, and revert to handle different types of errors that can occur during smart contract execution.|
+This Solidity contract, named Error, serves as a simple example to demonstrate various error handling mechanisms in Solidity. It includes the usage of require(0, assert(), and revert() to handle different types of errors that can occur during smart contract execution.
 
-```soldity
+```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.18;
+pragma solidity ^0.8.10;
 
-contract ExceptionHandling {
+contract Error {
 
-    // Function that uses 'require' for input validation
-    function RequireTest(uint a, uint b) public pure {
-        require(a + b < 10, "Ensure that the combined total of the provided numbers remains below 10.");
+    function testRequire(uint _i) public pure {
+
+        require(_i > 10, "Input must be greater than 10");
     }
 
-    // Function that uses 'assert' for checking a condition
-    function AssertTest(uint c) public pure {
-        assert(c >= 5);
+    function testRevert(uint _i) public pure {
+    
+        if (_i <= 10) {
+            revert("Input must be greater than 10");
+        }
     }
 
-    // Function that uses 'revert' with a custom error message
-    function RevertTest(uint d, uint e) public pure {
-        if (d + e > 10) {
-            revert("Please ensure that the sum of the entered numbers does not exceed 10.");
+    uint public num;
+
+    function testAssert() public view {
+
+        assert(num == 0);
+    }
+
+    error InsufficientBalance(uint balance, uint withdrawAmount);
+
+    function testCustomError(uint _withdrawAmount) public view {
+        
+        uint bal = address(this).balance;
+        if (bal < _withdrawAmount) {
+            revert InsufficientBalance({balance: bal, withdrawAmount: _withdrawAmount});
         }
     }
 }
@@ -33,20 +45,14 @@ contract ExceptionHandling {
 
 The contract ExceptionHandling is defined, and it contains three functions for demonstrating different error-handling mechanisms in Solidity: require, assert, and revert.
 
-**RequireTest Function:**
+**testRequire Function:**
 
-This function takes two unsigned integer parameters, a and b.
-It uses the require statement to validate that the sum of a and b is less than 10. If this condition is not met, the function reverts and provides the error message "Ensure that the combined total of the provided numbers remains below 10."
-The purpose of this function is to check and ensure that a condition holds true, typically used for input validation.
+The testRequire function is a publicly accessible and pure function in Solidity, designed to validate a numerical input parameter _i. It utilizes the require statement to enforce a condition that _i must be greater than 10. If the condition is not met, an error message "Input must be greater than 10" is thrown, preventing further execution. This function is useful for input validation in smart contracts, ensuring that only valid inputs meeting specified criteria are processed, contributing to the integrity and security of the blockchain application.
 
-**AssertTest Function:**
+**testRevert Function:**
 
-This function takes an unsigned integer parameter, c.
-It uses the assert statement to check if c is greater than or equal to 5. If this condition is not met, the function reverts.
-Unlike require, assert is used for conditions that should always be true, and it ensures that a critical invariant is not violated.
+The testRevert function, implemented in Solidity and declared as a publicly accessible and pure function, serves as an input validation mechanism. It checks whether the numerical parameter _i is less than or equal to 10. If this condition is true, the function triggers a revert operation with the error message "Input must be greater than 10," effectively reverting the state changes and halting further execution. This function is instrumental in maintaining the integrity of smart contract logic, ensuring that inputs conform to specified requirements and preventing undesired state changes when invalid conditions are encountered.
 
-**RevertTest Function:**
+**testAssert Function:**
 
-This function takes two unsigned integer parameters, d and e.
-It uses a conditional statement to check if the sum of d and e is greater than 10. If this condition is met, the function explicitly calls revert with the custom error message "Please ensure that the sum of the entered numbers does not exceed 10."
-revert is often used for custom error handling, allowing developers to provide descriptive error messages, and it gracefully reverts the transaction when necessary.
+The testAssert function, defined as a publicly accessible and view function in Solidity, employs the assert statement to verify a specific condition. In this case, it checks whether the variable num is equal to zero. If the condition evaluates to false, the assert statement triggers an exception, reverting the state and halting further execution. This function is commonly used for critical checks where deviations from expected conditions indicate potential errors or vulnerabilities. By enforcing the requirement that num must be zero, the function helps ensure the integrity of the smart contract's state and behavior, providing a safeguard against unexpected or undesirable situations.
