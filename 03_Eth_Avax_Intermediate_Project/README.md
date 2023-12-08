@@ -7,94 +7,63 @@ The Solidity smart contract, labeled under the MIT License, is a basic implement
 ## Code 
 
 ```solidity
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.18;
+// SPDX-License-Identifier: Unlicense
+pragma solidity ^0.8.0;
 
-contract myToken {
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+
+contract CustomERC20 is ERC20 {
+    using SafeMath for uint256;
 
     address public owner;
-    string public TokenName;
-    string public TokenAbbre;
-    uint8 public TokenDecimals;
-    uint256 public TokenTotalSupply;
 
-    constructor() {
+    constructor() ERC20("MetacraftersERC", "CRED") {
         owner = msg.sender;
-        TokenName = "MetacraftersERC";
-        TokenAbbre = "CRED";
-        TokenDecimals = 10;
-        TokenTotalSupply = 0;
     }
 
-    modifier Owner() {
-        require( msg.sender == owner, "Only the Admin can use creation tokens.");
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can perform this action");
         _;
     }
 
-    mapping(address => uint256) public balance;
-
-    function Minting(address to, uint256 amount) public Owner{
-        TokenTotalSupply += amount;
-        balance[to] += amount;
+    function mint(address to, uint256 amount) external onlyOwner {
+        _mint(to, amount);
     }
 
-    function transferTokens(address reciever, uint256 amount) public {
-        require( balance[msg.sender] >= amount, "Please choose an amount that is either equal to or less than your current balance." );
+    function transferTokens(address receiver, uint256 amount) external {
+        require(balanceOf(msg.sender) >= amount, "Insufficient balance");
 
-        balance[msg.sender] -= amount;
-        balance[reciever] += amount;
+        _transfer(msg.sender, receiver, amount);
     }
 
-    function Burning(uint256 amount) public {
-        require( balance[msg.sender] >= amount,"Please select an amount that is equal to or less than your current balance.");
+    function burn(uint256 amount) external {
+        require(balanceOf(msg.sender) >= amount, "Insufficient balance");
 
-        TokenTotalSupply -= amount;
-        balance[msg.sender] -= amount;
+        _burn(msg.sender, amount);
     }
 }
 ```
-The myToken smart contract is a basic implementation of a token contract on the Ethereum blockchain. It serves as a starting point for creating custom tokens and token-based applications. Let's break down its components, functions, and key concepts:
 
-**Contract Attributes**
+- Solidity code defines a custom ERC-20 token contract, CustomERC20, that inherits from OpenZeppelin's ERC20 implementation and uses the SafeMath library to prevent arithmetic vulnerabilities. Let's delve into each component in more detail.
 
-**owner:** This address variable stores the Ethereum address of the contract owner.
+- The SPDX-License-Identifier specifies that the code is released into the public domain without any restrictions (Unlicense). This means users are free to use, modify, and distribute the code without the need for attribution or adherence to any licensing terms.
 
-**TokenName and Tokensymbol:** These string variables represent the name and symbol of the token, respectively.
+- The pragma directive specifies the Solidity compiler version compatibility. In this case, the code is designed to work with Solidity version 0.8.0 or any later version.
 
-**TokenDecimals:** An unsigned integer variable specifying the number of decimal places for token balances.
+- Two external contracts are imported from the OpenZeppelin library. The first import brings in the ERC20 contract, which provides a standard interface for fungible tokens. The second import includes the SafeMath library, crucial for preventing arithmetic overflow and underflow vulnerabilities when dealing with unsigned integers.
 
-TokenTotalSupply: An unsigned integer variable representing the total supply of tokens. It is initially set to 0.
+- The CustomERC20 contract is declared, inheriting from the ERC20 contract and using SafeMath for uint256 operations. It introduces a public address variable owner, indicating the entity that initially deployed the contract.
 
-## Functions
+- The constructor initializes the ERC20 token with the name "MetacraftersERC" and the symbol "CRED." Additionally, it sets the owner variable to the address of the contract deployer. This establishes the owner's identity at the contract's deployment.
 
-**mintTokens(address to, uint256 amount)**
-This function allows the contract owner to create (mint) new tokens.
+- The onlyOwner modifier is defined, restricting certain functions to be executable only by the contract owner. This access control mechanism enhances security by limiting specific operations to authorized users.
 
-**Parameters:**
+- The mint function allows the owner to create new tokens and assign them to a specified address. The transferTokens function facilitates the transfer of tokens from the caller's address to another specified address, provided the caller has a sufficient token balance.
 
-to: The recipient's address.
-amount: The amount of tokens to mint.
-It increases the TokenTotalSupply by the specified amount and adds the minted tokens to the balance of the recipient's address.
+- The burn function enables the caller to destroy a specified amount of their own tokens, assuming they have a balance greater than or equal to the burn amount. This function can be useful for token holders who wish to reduce their token supply.
 
-**transferTokens(address receiver, uint256 amount)**
-
-This function enables token transfers between addresses.
-
-Parameters:
-
-receiver: The recipient's address.
-
-amount: The amount of tokens to transfer.
-It verifies that the sender has a balance greater than or equal to the transfer amount and then proceeds to transfer tokens from the sender to the receiver.
-
-**burnToken(uint256 amount)**
-
-This function allows token holders to destroy (burn) their tokens.
-
-**Parameters:**
-
-amount: The amount of tokens to burn.
-It checks if the sender has a balance greater than or equal to the burn amount and then reduces the TokenTotalSupply and subtracts the burned tokens from the sender's balance.
+- Overall, the contract combines standard ERC-20 functionality with additional features such as minting, transferring, and burning. Access control is enforced through the onlyOwner modifier, and the use of SafeMath enhances the contract's security by preventing common arithmetic vulnerabilities.
 
 ## Usage
 
