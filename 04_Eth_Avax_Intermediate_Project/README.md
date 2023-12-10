@@ -1,6 +1,6 @@
 ## Introduction 
 
-The "DegenGaming" smart contract represents a robust and versatile Ethereum-based solution designed for gaming purposes within the Avalanche Fuji Test Network. This contract serves as a foundational building block for creating immersive gaming experiences, enabling game developers to manage in-game assets, tokens, and transactions seamlessly. Made for Eth + Avax Intermediate Module 4 Project on the Metacrafters learning platform.
+The DegenGaming smart contract is a decentralized application (DApp) built on the Ethereum blockchain, designed to facilitate a virtual gaming ecosystem with its native digital asset, Degen Gaming Token (Degen). Utilizing the Solidity programming language and following version ^0.8.18 of the Ethereum Virtual Machine (EVM), this contract introduces a set of functionalities for managing in-game products, player balances, and the issuance and transfer of the Degen token.
 
 Let's delve into the salient features of this contract:
 
@@ -8,141 +8,152 @@ Let's delve into the salient features of this contract:
 ## Code
 ```solidity
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.18;
 
-contract DegenToken {
-
+contract DegenGaming {
     address public owner;
-    string public name = "Degen Gaming";
-    string public symbol = "DGN";
-    uint8 public decimals = 10;
+    string public gameName = "Degen Gaming";
+    string public gameSymbol = "Degen";
+    uint8 public gameDecimals = 10;
     uint256 public totalSupply = 0;
 
-    constructor() {
-        owner = msg.sender;
-        nftaccs[0] = Nft("Degen Sword", 50);
-        nftaccs[1] = Nft("Degen Stone", 100);
-        nftaccs[2] = Nft("Degen Coin", 200);
-        nftaccs[3] = Nft("Degen kit", 250);
-    }
+    mapping(uint256 => string) public productNames;
+    mapping(uint256 => uint256) public productPrices;
+    mapping(address => uint256) public playerBalances;
+    mapping(address => mapping(uint256 => bool)) public purchasedProducts;
+    mapping(address => uint256) public purchasedProductCount;
 
-    modifier ownerOnly() {
-        require(msg.sender == owner, "Only the owner is allowed to use this function");
+    event Mint(address indexed to, uint256 value);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Burn(address indexed from, uint256 value);
+    event Redeem(address indexed user, string itemName);
+
+    modifier onlyGameOwner() {
+        require(msg.sender == owner, "Only the owner can use this function.");
         _;
     }
 
-    mapping(address => uint256) private balance;
-    mapping(address => mapping(address => uint256)) private allowances;
-    mapping(uint256 => Nft) public nftaccs;
+    constructor() {
+        owner = msg.sender;
 
-    struct Nft {
-        string name;
-        uint256 price;
+        addGameProduct(0, "Game Hoodie", 5);
     }
 
-    event Mint(address indexed to, uint256 value);
-    event Approval(address indexed owner, address indexed spender, uint256 value);
-    event Transfer(address indexed from, address indexed to, uint256 value);
-    event Burn(address indexed from, uint256 value);
-    event Redeem(address indexed from, string itemName);
+    function addGameProduct(uint256 itemId, string memory _itemName, uint256 _itemPrice) public onlyGameOwner {
+        productNames[itemId] = _itemName;
+        productPrices[itemId] = _itemPrice;
+    }
 
-    function mint(address to, uint256 amount) external ownerOnly {
-        require(to != address(0), "Invalid recipient address");
-        require(amount > 0, "Amount must be greater than zero");
-
+    function createGameToken(address to, uint256 amount) external onlyGameOwner {
         totalSupply += amount;
-        balance[to] += amount;
-
+        playerBalances[to] += amount;
         emit Mint(to, amount);
         emit Transfer(address(0), to, amount);
     }
 
-    function balanceOf(address accountAddress) external view returns (uint256) {
-        return balance[accountAddress];
-    }
-
-    function transfer(address receiver, uint256 amount) external returns (bool) {
-        require(receiver != address(0), "Invalid recipient address");
-        require(balance[msg.sender] >= amount, "Insufficient balance for transfer");
-
-        balance[msg.sender] -= amount;
-        balance[receiver] += amount;
-
+    function gameTokenTransfer(address receiver, uint256 amount) external returns (bool) {
+        require(playerBalances[msg.sender] >= amount, "Insufficient balance for the transfer.");
+        playerBalances[msg.sender] -= amount;
+        playerBalances[receiver] += amount;
         emit Transfer(msg.sender, receiver, amount);
         return true;
     }
 
-    function transferFrom(address sender, address receiver, uint256 amount) external returns (bool) {
-        require(sender != address(0), "Invalid sender address");
-        require(receiver != address(0), "Invalid recipient address");
-        require(balance[sender] >= amount, "Insufficient balance for transfer");
-        require(allowances[sender][msg.sender] >= amount, "Allowance exceeded");
-
-        balance[sender] -= amount;
-        balance[receiver] += amount;
-        allowances[sender][msg.sender] -= amount;
-
-        emit Transfer(sender, receiver, amount);
-        return true;
-    }
-
-    function burn(uint256 amount) external {
-        require(balance[msg.sender] >= amount, "Insufficient balance for burn");
-        require(amount > 0, "Amount must be greater than zero");
-
-        balance[msg.sender] -= amount;
+    function burnGameToken(uint256 amount) external {
+        require(amount <= playerBalances[msg.sender], "Insufficient balance for burning.");
+        playerBalances[msg.sender] -= amount;
         totalSupply -= amount;
-
         emit Burn(msg.sender, amount);
         emit Transfer(msg.sender, address(0), amount);
     }
 
-    function redeem(uint256 accId) external returns (string memory) {
-        require(balance[msg.sender] > 0, "Balance is too low for redemption");
-        require(nftaccs[accId].price > 0, "Invalid item ID");
-        require(balance[msg.sender] >= nftaccs[accId].price, "Insufficient balance for redemption");
+    function redeemGameItem(uint256 itemId) external returns (string memory) {
+        require(productPrices[itemId] > 0, "Invalid item ID for redemption.");
+        uint256 redemptionAmount = productPrices[itemId];
+        require(playerBalances[msg.sender] >= redemptionAmount, "Insufficient balance to redeem the item.");
 
-        balance[msg.sender] -= nftaccs[accId].price;
+        playerBalances[msg.sender] -= redemptionAmount;
+        purchasedProducts[msg.sender][itemId] = true;
+        purchasedProductCount[msg.sender]++;
+        emit Redeem(msg.sender, productNames[itemId]);
 
-        emit Redeem(msg.sender, nftaccs[accId].name);
-
-        return nftaccs[accId].name;
+        return productNames[itemId];
     }
 
-    function approve(address spender, uint256 value) external returns (bool) {
-        
-        require(spender != address(0), "Invalid spender address");
-        allowances[msg.sender][spender] = value;
-        emit Approval(msg.sender, spender, value);
-        
-        return true;
+    function getRedeemedItemCount(address user) external view returns (uint256) {
+        return purchasedProductCount[user];
     }
 }
 ```
 
-**Token Minting (Mint Function):**
+The contract is named DegenGaming and specifies the version of the Solidity compiler to be used (^0.8.18).
+It includes state variables to store information such as the owner's address (owner), the name and symbol of the game token (gameName and gameSymbol), the number of decimals for the token (gameDecimals), and the total token supply (totalSupply).
 
-One of the central features of the contract is the ability to mint tokens, which can be achieved using the mint function. Minting tokens increases the overall token supply and allocates the newly minted tokens to a specific user's address. This functionality is instrumental for game developers as it allows them to generate in-game currency or rewards and distribute them to players as needed.
+**Mappings:**
 
-**Token Burning (Burn Function):**
+Several mappings are used to associate data with unique identifiers:
+productNames: Associates an itemId with the corresponding product name.
+productPrices: Associates an itemId with the price of the corresponding product.
+playerBalances: Associates player addresses with their Degen token balances.
+purchasedProducts: Tracks whether a player has purchased a specific item.
+purchasedProductCount: Counts the number of items a player has purchased.
 
-Users are empowered to burn (permanently remove from circulation) their own tokens through the burn function. The process of token burning reduces the total token supply, providing flexibility for implementing various mechanisms within the game. For example, it can be used to simulate the removal of currency from circulation or introduce deflationary dynamics. In-Game Item Store (GameStore Function):
+**Events:**
 
-The contract features an in-game item store that can be managed by the contract owner. The owner can use the GameStore function to add items to the store, each with a unique identifier, a name, and a price. This functionality lays the groundwork for the creation of a virtual marketplace within the game, allowing players to purchase items using tokens.
+The contract emits events to log important state changes. These include Mint for token creation, Transfer for token transfers, Burn for token burning, and Redeem for item redemptions.
 
-**Token Transfers (Transfer Function):**
+**Modifiers:**
 
-Users can transfer tokens to other players using the transfer function. This peer-to-peer token transfer mechanism enables in-game transactions, facilitating the exchange of currency or items among players.
+The onlyGameOwner modifier restricts certain functions to be accessible only by the owner of the contract, enhancing security and access control.
+Constructor:
 
-**Item Redemption (Itemredeem Function):**
+The constructor is called when the contract is deployed. It sets the contract owner to the address that deployed it and initializes the contract with an initial game product (a hoodie) using the addGameProduct function.
 
-A notable feature is the ability for users to redeem in-game items from the store in exchange for tokens. The Itemredeem function facilitates this process, deducting the required token amount from the user's balance and marking the item as redeemed. This enhances the interactive gaming experience, allowing players to acquire virtual assets within the game.
+**Functions:**
 
-**Balances and Redemption Tracking:**
+addGameProduct: Allows the owner to add new game products by specifying their itemId, name, and price.
+createGameToken: Allows the owner to mint new Degen tokens and assign them to a specified address.
+gameTokenTransfer: Enables players to transfer Degen tokens to other addresses.
+burnGameToken: Allows players to burn a specified amount of their Degen tokens, reducing the total supply.
+redeemGameItem: Lets players redeem in-game items by spending Degen tokens.
 
-The contract maintains a balance of tokens for each user through the balance mapping, ensuring transparency regarding token holdings. Additionally, it tracks the items that each user has redeemed and their respective counts using redeemedItems and redeemedItemCount mappings.
+**Modifiers and Checks:**
 
-The "DegenGaming" smart contract demonstrates a comprehensive set of functionalities, making it a valuable tool for game developers looking to implement blockchain-based gaming features, manage in-game economies, and provide players with engaging gaming experiences on the Avalanche Fuji Test Network.
+The contract uses the onlyGameOwner modifier to restrict certain functions to the contract owner.
+Various functions include require statements to check conditions before proceeding, such as ensuring sufficient balances or valid item redemptions.
+
+# Key Features:
+
+**Ownership and Initialization:**
+
+The contract is owned by an Ethereum address, and the owner has exclusive rights over certain privileged functions through the onlyGameOwner modifier.
+
+**Token Details:**
+
+The Degen token is characterized by a name ("Degen Gaming"), symbol ("Degen"), and 10 decimals.
+The contract starts with an initial total supply of 0 Degen tokens but allows the owner to mint new tokens and distribute them to players.
+
+**Game Products:**
+
+The contract supports a variety of in-game products, each identified by a unique itemId. Products have associated names and prices, and the owner can add new products through the addGameProduct function.
+
+**Token Minting and Transfers:**
+
+The owner can create Degen tokens and distribute them to players using the createGameToken function.
+Players can transfer Degen tokens to other addresses through the gameTokenTransfer function, subject to available balances.
+
+**Token Burning:**
+
+Players can burn their Degen tokens, reducing the total supply. This is done through the burnGameToken function, ensuring that the player has a sufficient balance.
+
+**Product Redemption:
+**
+Players can redeem in-game items using their Degen tokens, with each item associated with a specific itemId. The redeemGameItem function handles the redemption process, updating player balances and keeping track of redeemed items.
+
+**Events:**
+
+The contract emits events such as Mint, Transfer, Burn, and Redeem to provide transparency and allow external systems to listen for and react to specific activities within the contract.
+
 
 ## Getting Started With Remix
 ```solidity
