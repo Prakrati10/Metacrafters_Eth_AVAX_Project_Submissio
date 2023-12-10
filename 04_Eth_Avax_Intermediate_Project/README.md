@@ -157,37 +157,38 @@ The contract emits events such as Mint, Transfer, Burn, and Redeem to provide tr
 
 ## Getting Started With Remix
 ```solidity
-To execute this program and interact with the "DegenGaming" smart contract on the Avalanche Fuji Testnet, follow these steps:
+- To execute this program and interact with the "DegenGaming" smart contract on the Avalanche Fuji Testnet, follow these steps:
 
-Ensure Connection to Avalanche Fuji Testnet:
+- Ensure Connection to Avalanche Fuji Testnet:
 
-Make sure your metamask are connected to the Avalanche Fuji Testnet using your MetaMask wallet, and you have some test AVAX (Avalanche's native cryptocurrency) in your wallet to use for transactions.
+- Make sure your metamask are connected to the Avalanche Fuji Testnet using your MetaMask wallet, and you have some test AVAX (Avalanche's native cryptocurrency) in your wallet to use for transactions.
 
-Use Remix Solidity IDE:
+- Use Remix Solidity IDE:
 
-To run the program, you can use Remix, an online Solidity Integrated Development Environment (IDE). Access Remix by visiting the Remix website at https://remix.ethereum.org/.
+- To run the program, you can use Remix, an online Solidity Integrated Development Environment (IDE). Access Remix by visiting the Remix website at https://remix.ethereum.org/.
 
-Create a New Solidity File:
+- Create a New Solidity File:
 
-Once you are on the Remix website, create a new Solidity file by clicking on the "+" icon located in the left-hand sidebar.
-Save the newly created file with a .sol extension, for example, "DegenGaming.sol."
+- Once you are on the Remix website, create a new Solidity file by clicking on the "+" icon located in the left-hand sidebar.
+- Save the newly created file with a .sol extension, for example, "DegenGaming.sol."
 
-Copy and Paste the Contract Code:
+- Copy and Paste the Contract Code:
 
-Copy the code from the "DegenGaming.sol" file (or "token.sol" file) that you want to execute.
-Paste the copied code into your newly created "DegenGaming.sol" file in Remix.
+- Copy the code from the "DegenGaming.sol" file (or "token.sol" file) that you want to execute.
+- Paste the copied code into your newly created "DegenGaming.sol" file in Remix.
 
-Compile the Contract:
+- Compile the Contract:
 
-Click on the "Solidity Compiler" tab located in the left-hand sidebar.
-Ensure that the "Compiler" option is set to the latest Solidity version (or another compatible version).
-Click the "Compile" button to compile the contract code.
+- Click on the "Solidity Compiler" tab located in the left-hand sidebar.
+- Ensure that the "Compiler" option is set to the latest Solidity version (or another compatible version).
+- Click the "Compile" button to compile the contract code.
 
-Deploy the Contract:
+- Deploy the Contract:
 
-After successful compilation, Before deploying a smart contract, You have to connect remix with your wallet, then navigate to the "Deploy & Run Transactions" tab in the left-hand sidebar.
-Select your contract from the dropdown menu, which should be named "DegenGaming" or similar.
-Click the "Deploy" button to initiate the contract deployment process.
+- After successful compilation, Before deploying a smart contract, You have to connect remix with your wallet, then - ---- 
+- navigate to the "Deploy & Run Transactions" tab in the left-hand sidebar.
+- Select your contract from the dropdown menu, which should be named "DegenGaming" or similar.
+- Click the "Deploy" button to initiate the contract deployment process.
 
 Enter the Contract Address:
 
